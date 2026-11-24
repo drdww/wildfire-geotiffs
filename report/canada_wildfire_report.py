@@ -178,6 +178,23 @@ for key, fname in RASTERS.items():
     print(f"read {fname:40s} {grids[key]['data'].shape}")
 
 main = grids["rate_full"]
+# Hand pyproj / geopandas a plain "EPSG:3978" string, not rasterio's CRS object: on some
+# platforms (Databricks) pyproj cannot build a transformer from the rasterio object.
+MAP_CRS = "EPSG:3978"
+if main["crs"].to_epsg() not in (None, 3978):
+    MAP_CRS = main["crs"].to_string()
+# EPSG:3978 written out in full, used if PROJ cannot look the EPSG code up
+MAP_CRS_PROJ4 = ("+proj=lcc +lat_0=49 +lon_0=-95 +lat_1=49 +lat_2=77 +x_0=0 +y_0=0 "
+                 "+ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs")
+
+
+def lonlat_to_map():
+    """WGS84 lon/lat -> map CRS, with a fallback that needs no PROJ database lookup."""
+    try:
+        return Transformer.from_crs("EPSG:4326", MAP_CRS, always_xy=True)
+    except Exception as err:
+        print(f"note: EPSG lookup failed ({err}); using the PROJ string for EPSG:3978")
+        return Transformer.from_crs("+proj=longlat +datum=WGS84 +no_defs", MAP_CRS_PROJ4, always_xy=True)
 res = main["transform"].a
 x0 = main["transform"].c
 y0 = main["transform"].f
@@ -219,7 +236,7 @@ MAIN_EXTENT = grid_extent(main)
 # ---------------------------------------------------------------------
 # 3. SAMPLE: reproject, snap waterfront points to land, read every layer
 # ---------------------------------------------------------------------
-to_lcc = Transformer.from_crs("EPSG:4326", main["crs"], always_xy=True)
+to_lcc = lonlat_to_map()
 px, py = to_lcc.transform(pts[lon_col].to_numpy(), pts[lat_col].to_numpy())
 px = np.asarray(px, dtype=float)
 py = np.asarray(py, dtype=float)
@@ -330,14 +347,14 @@ try:
     if path is None:
         path = os.path.join(tempfile.gettempdir(), "na_admin1.geojson")
         urllib.request.urlretrieve(BOUNDARY_URL, path)
-    admin = gpd.read_file(path).to_crs(main["crs"])
+    admin = gpd.read_file(path).to_crs(MAP_CRS)
     print(f"province outlines       : {path}")
 except Exception as err:
     print(f"province outlines unavailable ({err}); drawing the land-mask outline instead")
     admin = None
 
 if prov_col is None and admin is not None:
-    pt_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(cell_x, cell_y), crs=main["crs"])
+    pt_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(cell_x, cell_y), crs=MAP_CRS)
     joined = gpd.sjoin(pt_gdf, admin[admin["country"] == "CAN"][["name", "geometry"]],
                        how="left", predicate="within")
     joined = joined[~joined.index.duplicated(keep="first")]
@@ -345,7 +362,7 @@ if prov_col is None and admin is not None:
     prov_col = "wf_province"
 
 # graticule lines in the map CRS
-to_lcc_lines = Transformer.from_crs("EPSG:4326", main["crs"], always_xy=True)
+to_lcc_lines = lonlat_to_map()
 GRATICULE = []
 for lat in [45, 50, 55, 60, 65, 70, 75, 80]:
     lons = np.linspace(-145, -45, 200)
