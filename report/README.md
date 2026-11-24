@@ -1,4 +1,17 @@
-# Canada wildfire-history report
+# Wildfire-history reports: Canada and USA
+
+Two one-cell scripts, same layout:
+
+| Script | Locations | Data | Outputs |
+|---|---|---|---|
+| `canada_wildfire_report.py` | Canada (CountryCode CA) | NBAC 1972–2025 | `canada_wildfire_report.pdf`, `locations_wildfire.xlsx` |
+| `usa_wildfire_report.py` | Lower 48 (CountryCode US) | MTBS 1984–2026, plus CAL FIRE FRAP and hazard zones for California | `usa_wildfire_report.pdf`, `usa_locations_wildfire.xlsx` |
+
+The US script needs the rasters from `wildfire_US_1km.zip`. California locations get extra
+`wf_ca_*` columns (FRAP score, class, times burned, years since last burn, CAL FIRE hazard
+zone) and a page of their own. Alaska and Hawaii are not covered.
+
+## Canada report
 
 `canada_wildfire_report.py` is a single notebook cell that samples the six Canada rasters at
 your locations and writes a 10-page 16:9 PDF report, one PNG per page for slides, and your rows back

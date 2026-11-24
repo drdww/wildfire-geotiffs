@@ -37,9 +37,10 @@ lower 48 = MTBS) and writes one consistent set of fields, so Canadian and US row
 raster as its own column: your columns + 32 with both zips. Check your setup against
 `scripts/example_points.csv` → `scripts/example_output_final_only.csv`.
 
-## Canada report (PDF) for a set of locations
+## PDF reports for a set of locations (Canada and USA)
 
-**[report/canada_wildfire_report.py](report/canada_wildfire_report.py)** is one notebook cell.
+**[report/canada_wildfire_report.py](report/canada_wildfire_report.py)** and
+**[report/usa_wildfire_report.py](report/usa_wildfire_report.py)** are one notebook cell each.
 Edit the paths, run it, and you get a 10-page 16:9 PDF, slide-ready PNGs and an .xlsx with
 the sampled columns. The smoothed score leads. Times burned, years since last burn and the class
 each get a page with the raster, your locations on a basemap, a distribution and the formula.
