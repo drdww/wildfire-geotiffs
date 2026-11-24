@@ -1,10 +1,10 @@
-name,lat,lon,region,snap_km_canada,snap_km_california,snap_km_conus,snap_km_na,ca_risk_rate_1950_2025_1km,ca_risk_rate_2021_2025_1km,fhsz_california_1km,nburns_california_1km,tslb_california_1km,wildfire_risk_score_california_1km,nburns_canada_1km,risk_rate_1972_2025_1km,risk_rate_2021_2025_1km,tslb_canada_1km,wildfire_risk_score_canada_1km,nburns_conus_1km,risk_rate_conus_1984_2026_1km,risk_rate_conus_2020_2024_1km,tslb_conus_1km,wildfire_risk_score_conus_1km
-Fort McMurray AB,56.726,-111.379,Canada,0.0,,,,,,,,,,1.0,0.018518518656492233,0.0,9.0,43.0,,,,,
-Kelowna BC,49.888,-119.496,Canada,0.0,,,,,,,,,,0.0,0.0,0.0,-1.0,17.0,,,,,
-Yellowknife NT,62.454,-114.372,Canada,0.0,,,,,,,,,,0.0,0.0,0.0,-1.0,3.0,,,,,
-Toronto ON,43.651,-79.347,Canada,1.03,,,,,,,,,,0.0,0.0,0.0,-1.0,0.0,,,,,
-Paradise CA,39.7596,-121.6219,California,,0.0,0.0,,0.01315789483487606,0.0,3.0,1.0,7.0,46.0,,,,,,1.0,0.023255813866853714,0.0,7.0,43.0
-Malibu CA,34.0259,-118.7798,California,,0.0,0.67,,0.09210526198148727,0.0,3.0,9.0,7.0,52.0,,,,,,2.0,0.04651162773370743,0.0,7.0,23.0
-Boulder CO,40.015,-105.27,CONUS,,,0.0,,,,,,,,,,,,,0.0,0.0,0.0,-1.0,5.0
-Hartford CT,41.7658,-72.6734,CONUS,,,0.0,,,,,,,,,,,,,0.0,0.0,0.0,-1.0,0.0
-Atlantic Ocean,38.0,-60.0,outside,,,,,,,,,,,,,,,,,,,,
+name,lat,lon,region,snap_km_canada,snap_km_california,snap_km_conus,ca_risk_rate_1950_2025_1km,ca_risk_rate_2021_2025_1km,fhsz_california_1km,nburns_california_1km,risk_class_5cat_california_1km,tslb_california_1km,wildfire_risk_score_california_1km,nburns_canada_1km,risk_class_5cat_canada_1km,risk_rate_1972_2025_1km,risk_rate_2021_2025_1km,tslb_canada_1km,wildfire_risk_score_canada_1km,nburns_conus_1km,risk_class_5cat_conus_1km,risk_rate_conus_1984_2026_1km,risk_rate_conus_2020_2024_1km,tslb_conus_1km,wildfire_risk_score_conus_1km
+Fort McMurray AB,56.726,-111.379,Canada,0.0,,,,,,,,,,1.0,2.0,0.018518518656492233,0.0,9.0,43.0,,,,,,
+Kelowna BC,49.888,-119.496,Canada,0.0,,,,,,,,,,0.0,0.0,0.0,0.0,-1.0,17.0,,,,,,
+Yellowknife NT,62.454,-114.372,Canada,0.0,,,,,,,,,,0.0,0.0,0.0,0.0,-1.0,3.0,,,,,,
+Toronto ON,43.651,-79.347,Canada,1.03,,,,,,,,,,0.0,0.0,0.0,0.0,-1.0,0.0,,,,,,
+Paradise CA,39.7596,-121.6219,California,,0.0,0.0,0.01315789483487606,0.0,3.0,1.0,2.0,7.0,46.0,,,,,,,1.0,2.0,0.023255813866853714,0.0,7.0,43.0
+Malibu CA,34.0259,-118.7798,California,,0.0,0.67,0.09210526198148727,0.0,3.0,9.0,5.0,7.0,52.0,,,,,,,2.0,3.0,0.04651162773370743,0.0,7.0,23.0
+Boulder CO,40.015,-105.27,CONUS,,,0.0,,,,,,,,,,,,,,0.0,0.0,0.0,0.0,-1.0,5.0
+Hartford CT,41.7658,-72.6734,CONUS,,,0.0,,,,,,,,,,,,,,0.0,0.0,0.0,0.0,-1.0,0.0
+Atlantic Ocean,38.0,-60.0,outside,,,,,,,,,,,,,,,,,,,,,,

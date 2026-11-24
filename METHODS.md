@@ -89,6 +89,51 @@ Stored as uint8, 0–100; `255` = off land.
 California's record spans 148 calendar years, but only 128 have a mapped fire, and the
 score uses those 128. The early decades are sparse, so this barely changes the map.
 
+## 5-category fire-history class — `risk_class_5cat_*`
+
+Built from times burned and time since last burn on each burned cell
+(`scripts/make_risk_class_5cat.py` rebuilds it from the rasters in this repo):
+
+| Times burned | Frequency points | | Time since last burn | Recency points |
+|---|---|---|---|---|
+| 1 | 1 | | 40+ yr | 1 |
+| 2 | 2 | | 20–39 yr | 2 |
+| 3–4 | 3 | | 10–19 yr | 3 |
+| 5–7 | 4 | | 5–9 yr | 4 |
+| 8+ | 5 | | 0–4 yr | 5 |
+
+```
+total = frequency points + recency points        (2 to 10)
+```
+
+| Total | Code | Class |
+|---|---|---|
+| 2–3 | 1 | Very low |
+| 4–5 | 2 | Low |
+| 6–7 | 3 | Moderate |
+| 8 | 4 | High |
+| 9–10 | 5 | Very high |
+
+`0` = on land but **no fire in the record**, deliberately its own code rather than
+class 1: an unburned cell is unknown, not low. `255` = off land.
+
+Share of land by class:
+
+| Region | No fire | Very low | Low | Moderate | High | Very high |
+|---|---:|---:|---:|---:|---:|---:|
+| Canada | 82.1% | 7.66 | 4.71 | 5.22 | 0.32 | 0.01 |
+| California | 63.8% | 10.17 | 11.00 | 11.72 | 2.53 | 0.76 |
+| CONUS | 91.5% | 2.09 | 4.05 | 2.17 | 0.16 | 0.02 |
+
+Classes are **not comparable across regions**. Longer records have more chances to
+accumulate burns (Canada 54 yr, California 148 yr, CONUS 43 yr), and CONUS misses fires
+under 500–1,000 acres. For a California point, use the California class rather than the
+CONUS one: at Malibu the California class is Very high (9 burns) while the CONUS class is
+Moderate (2 mapped burns).
+
+This is a history class, not a hazard forecast: recently burned ground can carry less
+fuel in the near term.
+
 ## CAL FIRE hazard zones — `fhsz_california_1km`
 
 CAL FIRE Fire Hazard Severity Zones 2024, rasterized onto the California 1 km grid,
@@ -109,6 +154,9 @@ The coarse coastline is why waterfront points can fall off the mask;
 
 ## Change log
 
+- **v1.2** — added `risk_class_5cat_{canada,california,conus}_1km` and
+  `scripts/make_risk_class_5cat.py`. The sampler now writes `snap_km_*` columns only for
+  regions whose rasters are present.
 - **v1.1** — `tslb_conus_1km`: 7,330 cells whose last burn was in 2026 were coded `-1`
   ("no fire in record") because 2025 − 2026 = −1. They are now `0`.
 - **v1.0** — first release.

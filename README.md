@@ -1,6 +1,6 @@
 # Wildfire history GeoTIFFs — Canada, California, CONUS (1 km)
 
-Sixteen 1 km rasters describing observed wildfire history, plus a script that samples
+Nineteen 1 km rasters describing observed wildfire history, plus a script that samples
 them at lat/lon points. `MANIFEST.csv` lists each file's region, product, period, CRS,
 dtype, nodata and value meaning. **[METHODS.md](METHODS.md)** gives the exact formula
 for every layer, including the smoothed risk score.
@@ -21,8 +21,9 @@ pip install rasterio pyproj pandas numpy
 python scripts/sample_points.py my_points.csv sampled.csv --lat lat --lon lon
 ```
 
-Output = your columns + one column per raster + `region` (Canada / California / CONUS /
-outside) + `snap_km_*`. Try it on `scripts/example_points.csv`; the expected result is
+Output = your columns + `region` (Canada / California / CONUS / outside) + one
+`snap_km_<region>` per region present + one column per raster. Sampling everything
+gives your columns **+ 23**; the Canada zip alone gives your columns **+ 8**. Try it on `scripts/example_points.csv`; the expected result is
 `scripts/example_output.csv`.
 
 The script handles three traps a plain `rasterio.sample` call falls into:
@@ -38,11 +39,11 @@ The script handles three traps a plain `rasterio.sample` call falls into:
 
 ## Files
 
-| Region | Burn rate, full record | Burn rate, recent 5 yr | Time since last burn | Times burned | Smoothed score |
-|---|---|---|---|---|---|
-| Canada | `risk_rate_1972_2025_1km` | `risk_rate_2021_2025_1km` | `tslb_canada_1km` | `nburns_canada_1km` | `wildfire_risk_score_canada_1km` |
-| California | `ca_risk_rate_1950_2025_1km` | `ca_risk_rate_2021_2025_1km` | `tslb_california_1km` | `nburns_california_1km` | `wildfire_risk_score_california_1km` |
-| CONUS | `risk_rate_conus_1984_2026_1km` | `risk_rate_conus_2020_2024_1km` | `tslb_conus_1km` | `nburns_conus_1km` | `wildfire_risk_score_conus_1km` |
+| Region | Burn rate, full record | Burn rate, recent 5 yr | Time since last burn | Times burned | Smoothed score | 5-category class |
+|---|---|---|---|---|---|---|
+| Canada | `risk_rate_1972_2025_1km` | `risk_rate_2021_2025_1km` | `tslb_canada_1km` | `nburns_canada_1km` | `wildfire_risk_score_canada_1km` | `risk_class_5cat_canada_1km` |
+| California | `ca_risk_rate_1950_2025_1km` | `ca_risk_rate_2021_2025_1km` | `tslb_california_1km` | `nburns_california_1km` | `wildfire_risk_score_california_1km` | `risk_class_5cat_california_1km` |
+| CONUS | `risk_rate_conus_1984_2026_1km` | `risk_rate_conus_2020_2024_1km` | `tslb_conus_1km` | `nburns_conus_1km` | `wildfire_risk_score_conus_1km` | `risk_class_5cat_conus_1km` |
 
 Plus `fhsz_california_1km`: CAL FIRE Fire Hazard Severity Zones (1 Moderate, 2 High,
 3 Very High; 0 = not zoned, which includes federal land).
@@ -63,6 +64,10 @@ include small fires.
   σ = 15 km, `freq` is the share of years burned, and `recency` is the same share with
   later years weighted more (see [METHODS.md](METHODS.md)). Scaled to each region's own
   maximum, so not comparable across regions; use burn rate for anything quantitative.
+
+- **5-category class**: frequency points (times burned) + recency points (time since
+  last burn), binned to 1 Very low … 5 Very high. `0` = no fire in the record (on land),
+  kept separate from class 1 on purpose. Full rule in [METHODS.md](METHODS.md).
 
 These are observed history, not a hazard forecast, and area burned is not loss.
 

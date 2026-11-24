@@ -5,6 +5,9 @@ fhsz_california_1km.tif,California,CAL FIRE FHSZ 2024,-,1.0,EPSG:3310,uint8,0.0,
 nburns_california_1km.tif,California,times burned,1878-2025,1.0,EPSG:3310,uint8,0.0,count of fire years; 0 = never burned (on land) or off land
 nburns_canada_1km.tif,Canada,times burned,1972-2025,1.0,EPSG:3978,uint8,0.0,count of fire years; 0 = never burned (on land) or off land
 nburns_conus_1km.tif,CONUS,times burned,1984-2026,1.0,EPSG:5070,uint8,0.0,count of fire years; 0 = never burned (on land) or off land
+risk_class_5cat_california_1km.tif,California,5-category fire-history class,1878-2025,1.0,EPSG:3310,uint8,255.0,"1 Very low, 2 Low, 3 Moderate, 4 High, 5 Very high; 0 = no fire in record (on land); 255 = off land"
+risk_class_5cat_canada_1km.tif,Canada,5-category fire-history class,1972-2025,1.0,EPSG:3978,uint8,255.0,"1 Very low, 2 Low, 3 Moderate, 4 High, 5 Very high; 0 = no fire in record (on land); 255 = off land"
+risk_class_5cat_conus_1km.tif,CONUS,5-category fire-history class,1984-2026,1.0,EPSG:5070,uint8,255.0,"1 Very low, 2 Low, 3 Moderate, 4 High, 5 Very high; 0 = no fire in record (on land); 255 = off land"
 risk_rate_1972_2025_1km.tif,Canada,burn rate,1972-2025,1.0,EPSG:3978,float32,-1.0,"share of years with fire, 0-1; -1 = off land"
 risk_rate_2021_2025_1km.tif,Canada,burn rate,2021-2025,1.0,EPSG:3978,float32,-1.0,"share of years with fire, 0-1; -1 = off land"
 risk_rate_conus_1984_2026_1km.tif,CONUS,burn rate,1984-2026,1.0,EPSG:5070,float32,-1.0,"share of years with fire, 0-1; -1 = off land"

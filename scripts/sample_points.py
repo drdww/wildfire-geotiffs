@@ -198,9 +198,11 @@ def main():
 
     pos = len(pts.columns)
     out.insert(pos, "region", region)
+    # one snap column per region whose rasters are present
     for name in ["snap_km_canada", "snap_km_california", "snap_km_conus", "snap_km_na"]:
-        pos = pos + 1
-        out.insert(pos, name, snap_cols.get(name))
+        if name in snap_cols:
+            pos = pos + 1
+            out.insert(pos, name, snap_cols[name])
 
     out.to_csv(args.out, index=False)
     print(f"wrote {args.out}")
