@@ -37,6 +37,17 @@ lower 48 = MTBS) and writes one consistent set of fields, so Canadian and US row
 raster as its own column: your columns + 32 with both zips. Check your setup against
 `scripts/example_points.csv` → `scripts/example_output_final_only.csv`.
 
+## Canada report (PDF) for a set of locations
+
+**[report/canada_wildfire_report.py](report/canada_wildfire_report.py)** is one notebook cell.
+Edit the paths, run it, and you get an 11-page 16:9 PDF, slide-ready PNGs and an .xlsx with
+the sampled columns. Each metric gets a page with three panels: the raster as a map, your
+locations on top, and the distribution. The pages also include the formulas, a watchlist of
+locations next to fire country, the top locations and a by-province table. See
+[report/README.md](report/README.md).
+
+## What the sampler handles
+
 The script handles three traps a plain `rasterio.sample` call falls into:
 
 1. **Different projections.** Canada is EPSG:3978, California EPSG:3310, CONUS

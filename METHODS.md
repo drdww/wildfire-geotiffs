@@ -152,7 +152,20 @@ land (most national forest and park land) is 0.
 The coarse coastline is why waterfront points can fall off the mask;
 `scripts/sample_points.py` moves such points to the nearest land cell within 3 km.
 
+## Distance to the nearest mapped fire (computed in the report)
+
+```
+d = Euclidean distance from the cell centre to the nearest cell with nburns ≥ 1   (km)
+```
+
+`report/canada_wildfire_report.py` computes this from `nburns_canada_1km` with an exact
+distance transform. It is not shipped as a raster. `0` = the cell itself burned.
+
 ## Change log
+
+- **v1.4** — added `report/canada_wildfire_report.py` (a one-cell PDF report for Canadian
+  locations) and `boundaries/na_admin1.geojson` (Natural Earth 1:50M provinces and states,
+  public domain).
 
 - **v1.3** — `sample_points.py` writes `final_*` columns: the same fields for every
   point, read from the point's own region (Canada NBAC, California FRAP, rest of CONUS
