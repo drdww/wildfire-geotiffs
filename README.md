@@ -2,7 +2,8 @@
 
 Sixteen 1 km rasters describing observed wildfire history, plus a script that samples
 them at lat/lon points. `MANIFEST.csv` lists each file's region, product, period, CRS,
-dtype, nodata and value meaning.
+dtype, nodata and value meaning. **[METHODS.md](METHODS.md)** gives the exact formula
+for every layer, including the smoothed risk score.
 
 ## Download
 
@@ -57,9 +58,11 @@ include small fires.
   unknown, but at least the record length. Treat it as censored, not as zero or as the
   record length.
 - **Times burned**: number of separate years with fire.
-- **Smoothed score** (0–100): frequency + recency, Gaussian-smoothed (σ = 15 km), scaled
-  to each region's own maximum. Not comparable across regions; use burn rate for anything
-  quantitative.
+- **Smoothed score** (0–100):
+  `round(100 · G(0.5·freq + 0.5·recency) / max)`, where `G` is a Gaussian blur with
+  σ = 15 km, `freq` is the share of years burned, and `recency` is the same share with
+  later years weighted more (see [METHODS.md](METHODS.md)). Scaled to each region's own
+  maximum, so not comparable across regions; use burn rate for anything quantitative.
 
 These are observed history, not a hazard forecast, and area burned is not loss.
 
