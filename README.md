@@ -16,15 +16,26 @@ git clone https://github.com/drdww/wildfire-geotiffs.git
 
 ## Sample your points
 
+**Quickest route: [PROMPT.md](PROMPT.md)** — a ready-to-paste prompt for Claude Code (or
+steps to follow yourself) that downloads both zips, checks the setup and samples your file.
+
+Unzip **both** release zips into the same folder, then:
+
 ```
 pip install rasterio pyproj pandas numpy
-python scripts/sample_points.py my_points.csv sampled.csv --lat lat --lon lon
+python scripts/sample_points.py my_points.csv sampled.csv --lat lat --lon lon --final-only
 ```
 
-Output = your columns + `region` (Canada / California / CONUS / outside) + one
-`snap_km_<region>` per region present + one column per raster. Sampling everything
-gives your columns **+ 23**; the Canada zip alone gives your columns **+ 8**. Try it on `scripts/example_points.csv`; the expected result is
-`scripts/example_output.csv`.
+**The answer is in the `final_*` columns.** For every point the script reads the rasters
+of the region the point falls in (Canada = NBAC, California = CAL FIRE FRAP, rest of the
+lower 48 = MTBS) and writes one consistent set of fields, so Canadian and US rows line up:
+`final_source`, `final_burn_rate_full`, `final_burn_rate_recent`, `final_tslb_yr`,
+`final_times_burned`, `final_score_0_100`, **`final_class_5cat`** / **`final_class_label`**
+(the final score) and `final_snap_km`.
+
+`--final-only` gives your columns + `region` + those 10. Without it you also get every
+raster as its own column: your columns + 32 with both zips. Check your setup against
+`scripts/example_points.csv` → `scripts/example_output_final_only.csv`.
 
 The script handles three traps a plain `rasterio.sample` call falls into:
 

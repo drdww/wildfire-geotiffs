@@ -1,0 +1,10 @@
+name,lat,lon,region,final_source,final_burn_rate_full,final_burn_rate_recent,final_tslb_yr,final_times_burned,final_score_0_100,final_class_5cat,final_class_label,final_snap_km
+Fort McMurray AB,56.726,-111.379,Canada,NBAC 1972-2025,0.018518518656492233,0.0,9.0,1.0,43.0,2.0,Low,0.0
+Kelowna BC,49.888,-119.496,Canada,NBAC 1972-2025,0.0,0.0,-1.0,0.0,17.0,0.0,No fire in record,0.0
+Yellowknife NT,62.454,-114.372,Canada,NBAC 1972-2025,0.0,0.0,-1.0,0.0,3.0,0.0,No fire in record,0.0
+Toronto ON,43.651,-79.347,Canada,NBAC 1972-2025,0.0,0.0,-1.0,0.0,0.0,0.0,No fire in record,1.03
+Paradise CA,39.7596,-121.6219,California,CAL FIRE FRAP 1878-2025,0.01315789483487606,0.0,7.0,1.0,46.0,2.0,Low,0.0
+Malibu CA,34.0259,-118.7798,California,CAL FIRE FRAP 1878-2025,0.09210526198148727,0.0,7.0,9.0,52.0,5.0,Very high,0.0
+Boulder CO,40.015,-105.27,CONUS,MTBS 1984-2026,0.0,0.0,-1.0,0.0,5.0,0.0,No fire in record,0.0
+Hartford CT,41.7658,-72.6734,CONUS,MTBS 1984-2026,0.0,0.0,-1.0,0.0,0.0,0.0,No fire in record,0.0
+Atlantic Ocean,38.0,-60.0,outside,,,,,,,,,

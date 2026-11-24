@@ -154,6 +154,10 @@ The coarse coastline is why waterfront points can fall off the mask;
 
 ## Change log
 
+- **v1.3** — `sample_points.py` writes `final_*` columns: the same fields for every
+  point, read from the point's own region (Canada NBAC, California FRAP, rest of CONUS
+  MTBS), with `final_class_5cat` / `final_class_label` as the final score. New
+  `--final-only` flag. Added `PROMPT.md`.
 - **v1.2** — added `risk_class_5cat_{canada,california,conus}_1km` and
   `scripts/make_risk_class_5cat.py`. The sampler now writes `snap_km_*` columns only for
   regions whose rasters are present.

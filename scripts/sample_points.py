@@ -3,7 +3,13 @@
 Usage
     python sample_points.py points.csv out.csv
     python sample_points.py points.csv out.csv --lat latitude --lon longitude
+    python sample_points.py points.csv out.csv --final-only
     python sample_points.py points.csv out.csv --tifs D:/wildfire/tifs --snap-km 3
+
+The answer is in the final_* columns: one set of fields for every point, read from the
+rasters of the region the point falls in (Canada = NBAC, California = CAL FIRE FRAP,
+rest of the lower 48 = MTBS). final_class_5cat / final_class_label is the final score.
+--final-only drops the per-raster columns and keeps just your columns + region + final_*.
 
 Needs: rasterio, pyproj, pandas, numpy.
 
@@ -45,6 +51,48 @@ REFERENCE = {
     "EPSG:5070": "risk_rate_conus_1984_2026_1km.tif",
     "ESRI:102008": "na_fire_5km_burn_rate_common.tif",
 }
+
+# final_* columns: the same field for every point, read from the raster of the
+# region the point falls in (California uses CAL FIRE FRAP, not MTBS)
+FINAL_FIELDS = ["final_source", "final_burn_rate_full", "final_burn_rate_recent",
+                "final_tslb_yr", "final_times_burned", "final_score_0_100",
+                "final_class_5cat", "final_class_label", "final_snap_km"]
+
+REGION_FILES = {
+    "Canada": {
+        "source": "NBAC 1972-2025",
+        "snap": "snap_km_canada",
+        "final_burn_rate_full": "risk_rate_1972_2025_1km",
+        "final_burn_rate_recent": "risk_rate_2021_2025_1km",
+        "final_tslb_yr": "tslb_canada_1km",
+        "final_times_burned": "nburns_canada_1km",
+        "final_score_0_100": "wildfire_risk_score_canada_1km",
+        "final_class_5cat": "risk_class_5cat_canada_1km",
+    },
+    "California": {
+        "source": "CAL FIRE FRAP 1878-2025",
+        "snap": "snap_km_california",
+        "final_burn_rate_full": "ca_risk_rate_1950_2025_1km",
+        "final_burn_rate_recent": "ca_risk_rate_2021_2025_1km",
+        "final_tslb_yr": "tslb_california_1km",
+        "final_times_burned": "nburns_california_1km",
+        "final_score_0_100": "wildfire_risk_score_california_1km",
+        "final_class_5cat": "risk_class_5cat_california_1km",
+    },
+    "CONUS": {
+        "source": "MTBS 1984-2026",
+        "snap": "snap_km_conus",
+        "final_burn_rate_full": "risk_rate_conus_1984_2026_1km",
+        "final_burn_rate_recent": "risk_rate_conus_2020_2024_1km",
+        "final_tslb_yr": "tslb_conus_1km",
+        "final_times_burned": "nburns_conus_1km",
+        "final_score_0_100": "wildfire_risk_score_conus_1km",
+        "final_class_5cat": "risk_class_5cat_conus_1km",
+    },
+}
+
+CLASS_LABELS = {0: "No fire in record", 1: "Very low", 2: "Low", 3: "Moderate",
+                4: "High", 5: "Very high"}
 
 SNAP_LABEL = {
     "EPSG:3978": "snap_km_canada",
@@ -119,6 +167,8 @@ def main():
     default_tifs = Path(__file__).resolve().parent.parent / "tifs"
     ap.add_argument("--tifs", default=str(default_tifs))
     ap.add_argument("--snap-km", type=float, default=3.0)
+    ap.add_argument("--final-only", action="store_true",
+                    help="write only your columns + region + the final_* columns")
     args = ap.parse_args()
 
     pts = pd.read_csv(args.points)
@@ -196,17 +246,55 @@ def main():
         else:
             region.append("outside")
 
+    # final_* columns: the same fields for every point, taken from its own region's rasters
+    final = {}
+    for name in FINAL_FIELDS:
+        final[name] = []
+    for i in range(len(out)):
+        files = REGION_FILES.get(region[i])
+        for name in FINAL_FIELDS:
+            if files is None:
+                final[name].append(None)
+            elif name == "final_source":
+                final[name].append(files["source"])
+            elif name == "final_snap_km":
+                moved = snap_cols.get(files["snap"])
+                if moved is None:
+                    final[name].append(None)
+                else:
+                    final[name].append(moved[i])
+            elif name == "final_class_label":
+                code = final["final_class_5cat"][i]
+                if code is None or pd.isna(code):
+                    final[name].append(None)
+                else:
+                    final[name].append(CLASS_LABELS[int(code)])
+            else:
+                col = out.get(files[name])
+                if col is None:
+                    final[name].append(None)
+                else:
+                    final[name].append(col.iloc[i])
+
     pos = len(pts.columns)
     out.insert(pos, "region", region)
+    for name in FINAL_FIELDS:
+        pos = pos + 1
+        out.insert(pos, name, final[name])
     # one snap column per region whose rasters are present
     for name in ["snap_km_canada", "snap_km_california", "snap_km_conus", "snap_km_na"]:
         if name in snap_cols:
             pos = pos + 1
             out.insert(pos, name, snap_cols[name])
 
+    if args.final_only:
+        keep = list(pts.columns) + ["region"] + FINAL_FIELDS
+        out = out[keep]
+
     out.to_csv(args.out, index=False)
-    print(f"wrote {args.out}")
+    print(f"wrote {args.out} ({len(out.columns)} columns)")
     print(out["region"].value_counts().to_string())
+    print(out["final_class_label"].value_counts(dropna=False).to_string())
 
 
 if __name__ == "__main__":
