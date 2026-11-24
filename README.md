@@ -40,10 +40,11 @@ raster as its own column: your columns + 32 with both zips. Check your setup aga
 ## Canada report (PDF) for a set of locations
 
 **[report/canada_wildfire_report.py](report/canada_wildfire_report.py)** is one notebook cell.
-Edit the paths, run it, and you get an 11-page 16:9 PDF, slide-ready PNGs and an .xlsx with
-the sampled columns. Each metric gets a page with three panels: the raster as a map, your
-locations on top, and the distribution. The pages also include the formulas, a watchlist of
-locations next to fire country, the top locations and a by-province table. See
+Edit the paths, run it, and you get a 10-page 16:9 PDF, slide-ready PNGs and an .xlsx with
+the sampled columns. The smoothed score leads. Times burned, years since last burn and the class
+each get a page with the raster, your locations on a basemap, a distribution and the formula.
+The pages also include where your locations are, the top 25 by score, a by-province table and
+summary statistics. See
 [report/README.md](report/README.md).
 
 ## What the sampler handles

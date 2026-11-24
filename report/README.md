@@ -1,7 +1,7 @@
 # Canada wildfire-history report
 
 `canada_wildfire_report.py` is a single notebook cell that samples the six Canada rasters at
-your locations and writes a 16:9 PDF report, one PNG per page for slides, and your rows back
+your locations and writes a 10-page 16:9 PDF report, one PNG per page for slides, and your rows back
 out with the sampled `wf_*` columns.
 
 ## Run it
@@ -24,28 +24,23 @@ CA / CAN / Canada), `LOCID`, `LOCNAME`, `CityName` and `Admin1Name`, or common v
 the `tifs/` folder first, then downloads the file from this repo. If neither works, it draws
 the land-mask outline instead.
 
-## The pages
+## The pages (v2)
 
 | Page | Content |
 |---|---|
-| 1 | Summary tiles and the class mix of your locations against all Canadian land |
-| 2 | Data, sampling method, every formula, caveats |
-| 3–8 | One page per metric: **A** the raster as a map, **B** your locations on top, **C** the distribution of your locations against all Canadian land, plus the formula |
-| 9 | Watchlist: locations with no fire in their own cell but a high smoothed score |
-| 10 | Highest fire-history class, sorted by class and then score |
-| 11 | By province (uses `Admin1Name`, or a spatial join when that column is missing) |
+| 1 | Summary tiles, and the score and class mix of your locations against all Canadian land |
+| 2 | Where the locations are: 40 km hexagon counts on a basemap, plus counts by province and city |
+| 3 | **Smoothed score**, the main measure: continuous raster, your locations coloured by score, histogram, key numbers, formula |
+| 4 | Times burned: raster, your burned locations on a basemap, bar chart, key numbers, formula |
+| 5 | Years since last burn: the same layout; the histogram covers only locations with fire in the record |
+| 6 | Fire-history class: the same layout |
+| 7 | The 25 locations with the highest smoothed score |
+| 8 | By province: mean and max score, score 10+, % fire in the cell, Moderate+, High+, watchlist (and value) |
+| 9 | Summary statistics for every measure |
+| 10 | Data, sampling and every formula |
 
-The metric pages, in order:
-
-1. fire-history class (the final score)
-2. smoothed score
-3. distance to the nearest mapped fire
-4. times burned
-5. time since last burn
-6. recent fire, 2021–2025
-
-Each metric is binned the same way on the map, the points and the bars, so one colour means
-the same thing in all three panels.
+The burn-rate layers are left out of the pages, because they are times burned divided by the
+number of years. They still appear in the summary statistics and the spreadsheet.
 
 ## Columns added to your rows
 
@@ -70,6 +65,6 @@ These pages were made from **synthetic** locations (jittered points around Canad
 Some fall in lakes or the sea, which is why they show as unmatched.
 
 ![summary](preview/page_01.png)
-![class](preview/page_03.png)
-![score](preview/page_04.png)
-![watchlist](preview/page_09.png)
+![where](preview/page_02.png)
+![score](preview/page_03.png)
+![years since last burn](preview/page_05.png)
