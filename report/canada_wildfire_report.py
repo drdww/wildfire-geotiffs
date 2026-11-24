@@ -8,7 +8,7 @@
 #   canada_wildfire_report.pdf   10 pages, 16:9:
 #                                summary, where the locations are, then one page each for
 #                                the smoothed score, times burned, years since last burn and
-#                                the fire-history class (A = raster, B = your locations on a
+#                                the fire-history class (A = raster, B = our locations on a
 #                                basemap, C = distribution, plus key numbers and the formula),
 #                                then top-25 table, by province, summary statistics, formulas
 #   pages/page_XX.png            the same pages as PNGs, ready for slides
@@ -603,8 +603,8 @@ def outside_note(view):
 
 
 def page_header(fig, title, subtitle):
-    fig.text(0.02, 0.955, title, fontsize=20, fontweight="bold", color=INK, va="center")
-    fig.text(0.02, 0.905, subtitle, fontsize=11.5, color=MUTED, va="center")
+    fig.text(0.02, 0.955, title, fontsize=18, fontweight="bold", color=INK, va="center")
+    fig.text(0.02, 0.908, subtitle, fontsize=11, color=MUTED, va="center")
 
 
 def page_footer(fig, page_no):
@@ -620,9 +620,8 @@ def panel_label(fig, box, letter, text):
 def soft_box(fig, box):
     ax = fig.add_axes(box)
     ax.axis("off")
-    ax.add_patch(FancyBboxPatch((0, 0), 1, 1, boxstyle="round,pad=0,rounding_size=0.03",
-                                transform=ax.transAxes, facecolor="#f4f2ed", edgecolor="#dad5ca",
-                                linewidth=0.8))
+    ax.add_patch(Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor="white",
+                           edgecolor="#bdbdbd", linewidth=0.8))
     return ax
 
 
@@ -775,7 +774,7 @@ tiles = [
 tile_w = 0.148
 for i, (big, small, note) in enumerate(tiles):
     ax = soft_box(fig, [0.02 + i * (tile_w + 0.012), 0.66, tile_w, 0.19])
-    ax.text(0.08, 0.62, big, fontsize=26, fontweight="bold", color=INK, transform=ax.transAxes)
+    ax.text(0.08, 0.62, big, fontsize=22, color=INK, transform=ax.transAxes)
     ax.text(0.08, 0.38, small, fontsize=11, color=INK, transform=ax.transAxes)
     ax.text(0.08, 0.15, note, fontsize=7.2, color=MUTED, transform=ax.transAxes, wrap=True)
 
@@ -786,7 +785,7 @@ mixes = [
 ]
 for name, labs, cols, loc_share, land_share, ybox in mixes:
     ax = fig.add_axes([0.13, ybox, 0.45, 0.16])
-    rows_to_draw = [("Your locations", loc_share), ("All Canadian land", land_share)]
+    rows_to_draw = [("Our sampled locations", loc_share), ("All Canadian land", land_share)]
     for j, (_, share) in enumerate(rows_to_draw):
         left = 0.0
         for code in range(len(labs)):
@@ -796,7 +795,7 @@ for name, labs, cols, loc_share, land_share, ybox in mixes:
                         fontsize=8, color=INK if code < len(labs) - 2 else "white")
             left = left + share[code]
     ax.set_yticks([0, 1])
-    ax.set_yticklabels(["Your locations", "All Canadian land"], fontsize=9)
+    ax.set_yticklabels(["Our sampled locations", "All Canadian land"], fontsize=9)
     ax.invert_yaxis()
     ax.set_xlim(0, 100)
     ax.tick_params(axis="x", labelsize=7, colors=MUTED)
@@ -808,28 +807,101 @@ for name, labs, cols, loc_share, land_share, ybox in mixes:
               frameon=False, handlelength=1.2)
 
 notes = [
-    ("Reading the numbers", True),
-    ("Most locations sit in towns and cities, and burn", False),
-    ("perimeters rarely enter them, so most cells have no", False),
-    ("fire in the record. That means unknown, not safe.", False),
-    ("", False),
-    ("The smoothed score has a value everywhere: it", False),
-    ("spreads past fires about 15 km into the surrounding", False),
-    ("land, so it measures how fire-prone the neighbourhood", False),
-    ("is. It is the main measure in this report.", False),
-    ("", False),
+    ("Notes", True),
     ("Times burned, years since last burn and the class", False),
-    ("describe the location's own 1 km cell.", False),
+    ("use the location's own 1 km cell.", False),
+    ("", False),
+    ("The smoothed score blurs fire history over about", False),
+    ("15 km, so every location has a value.", False),
+    ("", False),
+    ("Variables and formulas: page 2.", False),
 ]
 y = 0.55
 for text, head in notes:
-    fig.text(0.64, y, text, fontsize=12 if head else 10, fontweight="bold" if head else "normal", color=INK)
+    fig.text(0.64, y, text, fontsize=11 if head else 10, fontweight="bold" if head else "normal", color=INK)
     y = y - 0.032
 page_footer(fig, page_no)
 PAGES.append(fig)
 page_no = page_no + 1
 
-# ---- 2. where the locations are --------------------------------------
+# ---- 2. data and formulas ----------------------------------------------
+print(f"page {page_no}: data and formulas")
+fig = plt.figure(figsize=(16, 9))
+page_header(fig, "Data and formulas", "Every measure comes from one annual record of burned area on one 1 km grid")
+
+
+def section(x, y, title):
+    fig.text(x, y, title, fontsize=10.5, fontweight="bold", color=MUTED)
+    return y - 0.042
+
+
+def bullet(x, y, text, size=10.5):
+    fig.text(x, y, "•", fontsize=size, color=INK)
+    fig.text(x + 0.012, y, text, fontsize=size, color=INK)
+    return y - 0.036
+
+
+def term(x, y, symbol, meaning, gap=0.16):
+    fig.text(x, y, symbol, fontsize=10.5, color=INK)
+    fig.text(x + gap, y, meaning, fontsize=10, color=MUTED)
+    return y - 0.036
+
+
+x = 0.03
+y = 0.84
+y = section(x, y, "DATA")
+y = bullet(x, y, "Source: NBAC National Burned Area Composite, Natural Resources Canada.")
+y = bullet(x, y, "Every mapped fire perimeter in Canada, 1972–2025, small fires included.")
+y = bullet(x, y, "Perimeters gridded to 1 km cells in EPSG:3978 (NAD83 / Canada Atlas Lambert).")
+y = bullet(x, y, "A cell burned in a year if any fire perimeter from that year touches it.")
+y = bullet(x, y, "Land mask: Natural Earth 1:50M coastline.")
+y = y - 0.02
+y = section(x, y, "SAMPLING OUR LOCATIONS")
+y = bullet(x, y, "Each location's latitude/longitude (WGS84) is projected to EPSG:3978.")
+y = bullet(x, y, "Each measure is read from the 1 km cell the location falls in.")
+y = bullet(x, y, f"Locations just off the coarse coastline move to the nearest land cell within {SNAP_KM:g} km "
+                 f"({fmt_int(n_snapped)} moved).")
+y = bullet(x, y, f"{fmt_int(n_outside)} locations had no land within {SNAP_KM:g} km and are left blank.")
+y = y - 0.02
+y = section(x, y, "NOTES")
+y = bullet(x, y, "Fire history only: no fuel, weather or building information.")
+y = bullet(x, y, "The smoothed score is scaled to Canada's own maximum (100).")
+
+x = 0.53
+y = 0.84
+y = section(x, y, "VARIABLES")
+y = term(x, y, r"$y$", "a year: 1972, 1973, … 2025")
+y = term(x, y, r"$n$", "number of years = 54")
+y = term(x, y, r"$B_y$", "1 if any fire perimeter from year y touches the cell, else 0")
+y = term(x, y, r"$w_y = (y - 1971)\,/\,n$", "year weight: 1972 → 1/54, 1973 → 2/54, … 2025 → 1")
+y = term(x, y, r"$G$", "Gaussian blur with σ = 15 km")
+y = y - 0.015
+y = section(x, y, "MEASURES OF THE LOCATION'S OWN CELL")
+y = term(x, y, r"$\mathrm{times\ burned} = \sum_y B_y$", "number of years with fire", gap=0.2)
+y = term(x, y, r"$\mathrm{years\ since\ last\ burn} = 2025 - \mathrm{last}\ y\ \mathrm{with}\ B_y = 1$",
+         "", gap=0.17)
+y = term(x, y, "", "blank (no value) if the cell never burned", gap=0.0)
+y = term(x, y, "km to nearest fire", "distance to the closest cell that burned in 1972–2025 (0 = own cell burned)",
+         gap=0.11)
+y = y - 0.015
+y = section(x, y, "SMOOTHED SCORE (0–100)")
+y = term(x, y, r"$\mathrm{freq} = \sum_y B_y\,/\,n$", "share of years with fire", gap=0.2)
+y = term(x, y, r"$\mathrm{recency} = \sum_y w_y B_y\,/\,\sum_y w_y$", "same share, recent years count more",
+         gap=0.2)
+y = term(x, y, r"$\mathrm{score} = \mathrm{round}(100 \times G(0.5\,\mathrm{freq} + 0.5\,\mathrm{recency})\,/\,\mathrm{max})$",
+         "", gap=0.17)
+y = term(x, y, "", "max = the largest blurred value anywhere in Canada", gap=0.0)
+y = y - 0.015
+y = section(x, y, "FIRE-HISTORY CLASS")
+y = term(x, y, "frequency points", "times burned  1→1   2→2   3–4→3   5–7→4   8+→5", gap=0.11)
+y = term(x, y, "recency points", "years since last burn  40+→1   20–39→2   10–19→3   5–9→4   0–4→5", gap=0.11)
+y = term(x, y, "class", "points total 2–3 Very low · 4–5 Low · 6–7 Moderate · 8 High · 9–10 Very high", gap=0.11)
+y = term(x, y, "watchlist", f"no fire in the location's own cell, and smoothed score ≥ {WATCH_SCORE}", gap=0.11)
+page_footer(fig, page_no)
+PAGES.append(fig)
+page_no = page_no + 1
+
+# ---- 3. where the locations are --------------------------------------
 print(f"page {page_no}: where the locations are")
 fig = plt.figure(figsize=(16, 9))
 page_header(fig, "Where the locations are",
@@ -878,7 +950,7 @@ page_no = page_no + 1
 
 view_b = points_view(ok, B_ASPECT)
 
-# ---- 3. smoothed score -------------------------------------------------
+# ---- 4. smoothed score -------------------------------------------------
 print(f"page {page_no}: smoothed score")
 fig = plt.figure(figsize=(16, 9))
 page_header(fig, "Smoothed wildfire score (0–100)",
@@ -906,7 +978,7 @@ ax.scatter(cell_x[sel], cell_y[sel], c=sc[sel], cmap=SCORE_CMAP, norm=SCORE_NORM
 draw_cities(ax, view_b)
 draw_scalebar(ax, view_b)
 finish_map(ax, view_b)
-panel_label(fig, B_BOX, "B", f"Your locations, coloured by their score{outside_note(view_b)}")
+panel_label(fig, B_BOX, "B", f"Our locations, coloured by their score{outside_note(view_b)}")
 
 ax = fig.add_axes(C_BOX)
 edges = np.arange(0, 102, 2)
@@ -918,7 +990,7 @@ ax.set_xlim(0, 100)
 ax.set_xlabel("Smoothed score", fontsize=7.5, color=MUTED)
 ax.set_ylabel("Locations (log scale)", fontsize=7.5, color=MUTED)
 style_axis(ax)
-panel_label(fig, C_BOX, "C", "Distribution of your locations")
+panel_label(fig, C_BOX, "C", "Distribution of our locations")
 
 stats_box(fig, [
     ("Locations", fmt_int(sc_ok.sum())),
@@ -929,18 +1001,19 @@ stats_box(fig, [
     ("Score 10+", f"{pct(n_score10, sc_ok.sum()):.1f}%"),
 ])
 formula_band(fig, [
-    r"$\mathrm{freq} = \sum_y B_y\,/\,54$      $\mathrm{recency} = \sum_y w_y B_y\,/\,\sum_y w_y$  with  "
-    r"$w_y = \mathrm{rank}(y)/54$  (1972 = 1/54 … 2025 = 1)",
-    r"$\mathrm{score} = \mathrm{round}(100\cdot G_{\sigma = 15\,\mathrm{km}}(0.5\,\mathrm{freq} + 0.5\,\mathrm{recency})\,/\,\mathrm{max})$"
-    "      G = Gaussian blur; max = the highest value in Canada, so 100 is Canada's most fire-intense area",
-    r"$B_y = 1$ if any NBAC fire perimeter from year $y$ touches the 1 km cell, else 0.",
+    r"$y$ = year, 1972 … 2025 ($n$ = 54 years);   $B_y = 1$ if any NBAC fire perimeter from year $y$ touches "
+    r"the 1 km cell, else 0;   $w_y = (y - 1971)\,/\,54$ = year weight (1972 → 1/54, 2025 → 1)",
+    r"$\mathrm{freq} = \sum_y B_y\,/\,54$ = share of years with fire;     "
+    r"$\mathrm{recency} = \sum_y w_y B_y\,/\,\sum_y w_y$ = the same share with recent years counting more",
+    r"$\mathrm{score} = \mathrm{round}(100 \times G(0.5\,\mathrm{freq} + 0.5\,\mathrm{recency})\,/\,\mathrm{max})$"
+    "     G = Gaussian blur, σ = 15 km;  max = the largest blurred value anywhere in Canada (scores 100)",
 ])
 page_footer(fig, page_no)
 PAGES.append(fig)
 page_no = page_no + 1
 
 
-# ---- 4-6. own-cell metrics: times burned, years since last burn, class
+# ---- 5-7. own-cell metrics: times burned, years since last burn, class
 def own_cell_page(title, subtitle, grid_codes, names, colours, pt_codes, legend_title,
                   draw_c, stats_lines, formula_lines):
     fig = plt.figure(figsize=(16, 9))
@@ -969,7 +1042,7 @@ def own_cell_page(title, subtitle, grid_codes, names, colours, pt_codes, legend_
     draw_scalebar(ax, view_b)
     finish_map(ax, view_b)
     n_hit = int((pt_codes >= 1).sum())
-    panel_label(fig, B_BOX, "B", f"Your {fmt_int(n_hit)} locations with fire in their cell; "
+    panel_label(fig, B_BOX, "B", f"Our {fmt_int(n_hit)} locations with fire in their cell; "
                                  f"grey = no fire in record{outside_note(view_b)}")
 
     ax = fig.add_axes(C_BOX)
@@ -996,8 +1069,8 @@ nb_stats = [
 nb_formula = [
     r"$\mathrm{times\ burned} = \sum_{y=1972}^{2025} B_y$      "
     r"$B_y = 1$ if any NBAC fire perimeter from year $y$ touches the 1 km cell",
-    "Counts years with fire, not fires. Most of your locations show 0 because their own cell never burned;",
-    "the smoothed score (previous page) is what picks up fire nearby.",
+    "Counts years with fire, not individual fires.",
+    "Most of our locations are 0 because their own cell never burned.",
 ]
 def draw_nothing(ax):
     ax.axis("off")
@@ -1012,7 +1085,7 @@ def make_nb_page():
     ax = page.add_axes(C_BOX)
     bar_counts(ax, ["Never", "1", "2", "3–4", "5–7", "8+"], SIX_COLOURS, nb_counts.astype(float))
     ax.set_xlabel("Years with fire in the location's cell", fontsize=7.5, color=MUTED)
-    panel_label(page, C_BOX, "C", "Your locations by times burned")
+    panel_label(page, C_BOX, "C", "Our locations by times burned")
     return page
 
 
@@ -1034,8 +1107,8 @@ ts_stats = [
 ]
 ts_formula = [
     r"$\mathrm{years\ since\ last\ burn} = 2025 - \mathrm{max}\{\,y : B_y = 1\,\}$",
-    "Only defined where the cell burned at least once, so the histogram covers only those locations. Cells with no",
-    "fire in the record have no value: at least 54 years, true value unknown.",
+    "Only defined where the cell burned at least once, so the histogram covers only those locations.",
+    "Cells with no fire in the record have no value.",
 ]
 page = own_cell_page("Years since last burn",
                      f"{fmt_int(n_ts)} locations have fire in their cell's record; "
@@ -1057,7 +1130,7 @@ if n_ts > 0:
 ax.set_xlabel("Years since last burn (counted back from 2025; recent on the right)", fontsize=7.5, color=MUTED)
 ax.set_ylabel("Locations", fontsize=7.5, color=MUTED)
 style_axis(ax)
-panel_label(page, C_BOX, "C", f"Your {fmt_int(n_ts)} locations with fire in the record")
+panel_label(page, C_BOX, "C", f"Our {fmt_int(n_ts)} locations with fire in the record")
 PAGES.append(page)
 del ts_grid
 page_no = page_no + 1
@@ -1076,7 +1149,7 @@ cls_formula = [
     "Frequency points from times burned:  1 → 1   2 → 2   3–4 → 3   5–7 → 4   8+ → 5        "
     "Recency points from years since last burn:  40+ → 1   20–39 → 2   10–19 → 3   5–9 → 4   0–4 → 5",
     "Total = frequency + recency (2–10):   2–3 Very low  ·  4–5 Low  ·  6–7 Moderate  ·  8 High  ·  9–10 Very high",
-    "Combines the previous two pages for the location's own cell. A cell with no fire in the record gets no class.",
+    "Uses times burned and years since last burn for the location's own cell. A cell with no fire in the record has no class.",
 ]
 page = own_cell_page("Fire-history class",
                      f"{fmt_int(cls_counts[1:].sum())} locations ({pct(cls_counts[1:].sum(), cls_counts.sum()):.1f}%) "
@@ -1086,65 +1159,82 @@ page = own_cell_page("Fire-history class",
 ax = page.add_axes(C_BOX)
 bar_counts(ax, ["No fire", "Very low", "Low", "Moderate", "High", "Very high"], SIX_COLOURS,
            cls_counts.astype(float))
-panel_label(page, C_BOX, "C", "Your locations by class")
+panel_label(page, C_BOX, "C", "Our locations by class")
 PAGES.append(page)
 del cls_grid
 page_no = page_no + 1
 
-# ---- 7. top locations by smoothed score --------------------------------
-print(f"page {page_no}: top locations")
+# ---- watchlist ---------------------------------------------------------
+print(f"page {page_no}: watchlist")
+fire_free = score_land & (grids["cls"]["data"] == 0)
+watch_land_share = pct(int((fire_free & (score_main >= WATCH_SCORE)).sum()), int(fire_free.sum()))
 fig = plt.figure(figsize=(16, 9))
-page_header(fig, "Highest smoothed score",
-            "The 25 locations with the highest smoothed score (one row per location ID). "
-            "Class 'No fire in record' = fire nearby but not in the location's own cell.")
-top = pts[sc_ok].copy()
-top = top.sort_values(["wf_score_0_100", "wf_class_5cat"], ascending=[False, False])
+page_header(fig, "Watchlist: fire nearby, none in the location's own cell",
+            f"{fmt_int(n_watch)} locations have no fire in their own 1 km cell but a smoothed score of "
+            f"{WATCH_SCORE} or more (the top {watch_land_share:.0f}% of fire-free Canadian land).")
+box = [0.02, 0.06, 0.44, 0.78]
+ax = fig.add_axes(box)
+if n_watch > 0:
+    view_w = points_view(watch, (box[2] * 16) / (box[3] * 9))
+else:
+    view_w = view_b
+draw_base(ax)
+masked = np.ma.masked_where(~score_land, score_main.astype(np.float32))
+ax.imshow(masked, cmap=SCORE_CMAP, norm=SCORE_NORM, extent=MAIN_EXTENT, origin="upper",
+          interpolation="antialiased", alpha=0.75, zorder=2)
+draw_outlines(ax)
+others = ok & ~watch
+ax.scatter(cell_x[others], cell_y[others], s=5, c="#7d8890", edgecolors="none", zorder=18)
+ax.scatter(cell_x[watch], cell_y[watch], s=34, c="#6a1b9a", edgecolors="white", linewidths=0.6, zorder=22)
+draw_cities(ax, view_w)
+draw_scalebar(ax, view_w)
+finish_map(ax, view_w)
+map_legend(ax, ["Watchlist location", "Other location"], ["#6a1b9a", "#7d8890"], None, loc="upper left")
+score_colorbar(ax, "Smoothed score")
+panel_label(fig, box, "", f"Watchlist locations over the smoothed score{outside_note(view_w)}")
+
+wl = pts[watch].copy()
+wl = wl.sort_values(["wf_score_0_100", "wf_km_to_fire"], ascending=[False, True])
 if id_col is not None:
-    top = top.drop_duplicates(id_col)
+    wl = wl.drop_duplicates(id_col)
 cols_out = {}
 if id_col is not None:
-    cols_out["ID"] = top[id_col].astype(str).str.slice(0, 14)
+    cols_out["ID"] = wl[id_col].astype(str).str.slice(0, 14)
 if name_col is not None:
-    cols_out["Name"] = top[name_col].astype(str).str.slice(0, 30)
+    cols_out["Name"] = wl[name_col].astype(str).str.slice(0, 26)
 if city_col is not None:
-    cols_out["City"] = top[city_col].astype(str).str.slice(0, 18)
+    cols_out["City"] = wl[city_col].astype(str).str.slice(0, 18)
 if prov_col is not None:
-    cols_out["Province"] = top[prov_col].astype(str).str.slice(0, 18)
-cols_out["Score"] = top["wf_score_0_100"].map("{:.0f}".format)
-cols_out["Class"] = top["wf_class_label"]
-cols_out["Times burned"] = top["wf_times_burned"].map("{:.0f}".format)
-last = []
-for v in top["wf_last_burn_year"]:
-    if pd.isna(v):
-        last.append("–")
-    else:
-        last.append(f"{v:.0f}")
-cols_out["Last burn"] = last
-cols_out["Km to fire"] = top["wf_km_to_fire"].map("{:.0f}".format)
+    cols_out["Province"] = wl[prov_col].astype(str).str.slice(0, 18)
+cols_out["Score"] = wl["wf_score_0_100"].map("{:.0f}".format)
+cols_out["Km to nearest fire"] = wl["wf_km_to_fire"].map("{:.0f}".format)
 if value_col is not None:
-    cols_out["Value"] = pd.to_numeric(top[value_col], errors="coerce").map("{:,.0f}".format)
-top_table = pd.DataFrame(cols_out).head(25)
-ax = fig.add_axes([0.02, 0.05, 0.96, 0.80])
+    cols_out["Value"] = pd.to_numeric(wl[value_col], errors="coerce").map("{:,.0f}".format)
+wl_table = pd.DataFrame(cols_out).head(24)
+ax = fig.add_axes([0.49, 0.06, 0.49, 0.76])
 widths = []
-for col in top_table.columns:
-    if col in ["Score", "Times burned", "Last burn", "Km to fire"]:
-        widths.append(0.075)
+for col in wl_table.columns:
+    if col == "Score":
+        widths.append(0.07)
+    elif col == "Km to nearest fire":
+        widths.append(0.16)
     elif col == "Name":
-        widths.append(0.22)
-    elif col == "Class":
-        widths.append(0.11)
+        widths.append(0.25)
     else:
-        widths.append(0.12)
-draw_table(ax, top_table, widths, fontsize=8.5)
+        widths.append(0.15)
+draw_table(ax, wl_table, widths)
+ax.set_title(f"Top {len(wl_table)} by smoothed score (one row per location ID). Km to nearest fire = "
+             "distance from the location's cell to the closest cell that burned in 1972–2025.",
+             fontsize=8.5, color=MUTED, loc="left", wrap=True)
 page_footer(fig, page_no)
 PAGES.append(fig)
 page_no = page_no + 1
 
-# ---- 8. by province ----------------------------------------------------
+# ---- 9. by province ----------------------------------------------------
 if prov_col is not None:
     print(f"page {page_no}: provinces")
     fig = plt.figure(figsize=(16, 9))
-    page_header(fig, "By province", "Shading runs light to dark within each column")
+    page_header(fig, "By province", "Darker shading = higher value within the column")
     sub = pts[ok].copy()
     sub["_prov"] = sub[prov_col].fillna("(blank)").astype(str)
     sub["_score10"] = (sub["wf_score_0_100"] >= 10).astype(int)
@@ -1194,7 +1284,7 @@ if prov_col is not None:
     PAGES.append(fig)
     page_no = page_no + 1
 
-# ---- 9. summary statistics ---------------------------------------------
+# ---- 10. summary statistics ---------------------------------------------
 print(f"page {page_no}: summary statistics")
 fig = plt.figure(figsize=(16, 9))
 page_header(fig, "Summary statistics", "Each value is read at the location's own 1 km cell")
@@ -1221,7 +1311,7 @@ rows = [
     stat_row("Burn rate, 1972–2025", vals["rate_full"][ok], "all locations", share_pos(vals["rate_full"][ok])),
     stat_row("Burn rate, 2021–2025", vals["rate_recent"][ok], "all locations", share_pos(vals["rate_recent"][ok])),
     stat_row("Years since last burn", ts[ts_burned].astype(float), "fire in record only", "–"),
-    stat_row("Km to nearest mapped fire", vals["dist"][ok], "all locations", share_pos(vals["dist"][ok])),
+    stat_row("Km to nearest fire", vals["dist"][ok], "all locations", share_pos(vals["dist"][ok])),
 ]
 stats_df = pd.DataFrame(rows, columns=["Measure", "Applies to", "Locations", "Mean", "Median",
                                        "90th pct", "Max", "Share > 0"])
@@ -1229,7 +1319,7 @@ ax = fig.add_axes([0.02, 0.45, 0.96, 0.40])
 draw_table(ax, stats_df, [0.2, 0.13, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09], fontsize=10)
 notes = [
     "Burn rate = times burned / number of years in the window (54 for 1972–2025, 5 for 2021–2025).",
-    "Km to nearest mapped fire = straight-line distance from the location's cell to the nearest cell that burned in 1972–2025.",
+    "Km to nearest fire = straight-line distance from the location's cell to the closest cell that burned in 1972–2025 (0 = its own cell burned).",
     f"Not matched: {fmt_int(n_outside)} locations had no land cell within {SNAP_KM:g} km and are left blank in the spreadsheet.",
 ]
 y = 0.36
@@ -1239,53 +1329,6 @@ for line in notes:
 page_footer(fig, page_no)
 PAGES.append(fig)
 page_no = page_no + 1
-
-# ---- 10. data and formulas ----------------------------------------------
-print(f"page {page_no}: data and formulas")
-fig = plt.figure(figsize=(16, 9))
-page_header(fig, "Data and formulas", "All layers come from one annual burned-area record on one 1 km grid")
-left_lines = [
-    ("DATA", True),
-    ("NBAC National Burned Area Composite (Natural Resources Canada): every mapped", False),
-    ("fire perimeter in Canada, 1972–2025, small fires included.", False),
-    ("Gridded to 1 km cells, EPSG:3978 (NAD83 / Canada Atlas Lambert).", False),
-    (r"A cell burned in year $y$ ($B_y = 1$) if any perimeter from that year touches it.", False),
-    ("", False),
-    ("SAMPLING", True),
-    ("Lat/lon (WGS84) is projected to EPSG:3978 and the 1 km cell is read.", False),
-    (f"Locations just off the coarse coastline move to the nearest land cell within {SNAP_KM:g} km", False),
-    (f"({fmt_int(n_snapped)} moved); {fmt_int(n_outside)} had no land within reach.", False),
-    ("", False),
-    ("LIMITS", True),
-    ("History, not a forecast: freshly burned ground can carry less fuel for a few years.", False),
-    ("Perimeters rarely enter towns, so urban cells mostly have no fire in the record.", False),
-    ("The smoothed score is relative to Canada's own maximum.", False),
-]
-right_lines = [
-    ("SMOOTHED SCORE", True),
-    (r"$w_y = \mathrm{rank}(y)/54$,  $\mathrm{freq} = \sum B_y/54$,  $\mathrm{recency} = \sum w_y B_y / \sum w_y$", False),
-    (r"$\mathrm{score} = \mathrm{round}(100\cdot G_{15\,\mathrm{km}}(0.5\,\mathrm{freq} + 0.5\,\mathrm{recency})\,/\,\mathrm{max})$", False),
-    ("", False),
-    ("OWN-CELL MEASURES", True),
-    (r"$\mathrm{times\ burned} = \sum_y B_y$      $\mathrm{burn\ rate} = \sum_y B_y\,/\,n_{years}$", False),
-    (r"$\mathrm{years\ since\ last\ burn} = 2025 - \mathrm{max}\{\,y : B_y = 1\,\}$", False),
-    ("", False),
-    ("FIRE-HISTORY CLASS", True),
-    ("frequency points  1→1  2→2  3–4→3  5–7→4  8+→5", False),
-    ("recency points  40+→1  20–39→2  10–19→3  5–9→4  0–4→5", False),
-    ("total 2–3 Very low · 4–5 Low · 6–7 Moderate · 8 High · 9–10 Very high", False),
-    ("", False),
-    ("WATCHLIST", True),
-    (f"no fire in the location's cell and smoothed score ≥ {WATCH_SCORE}", False),
-]
-for x_pos, lines in [(0.03, left_lines), (0.53, right_lines)]:
-    y = 0.84
-    for text, head in lines:
-        fig.text(x_pos, y, text, fontsize=10 if head else 10.5, fontweight="bold" if head else "normal",
-                 color=MUTED if head else INK)
-        y = y - 0.04
-page_footer(fig, page_no)
-PAGES.append(fig)
 
 # ---------------------------------------------------------------------
 # 8. WRITE

@@ -24,23 +24,20 @@ CA / CAN / Canada), `LOCID`, `LOCNAME`, `CityName` and `Admin1Name`, or common v
 the `tifs/` folder first, then downloads the file from this repo. If neither works, it draws
 the land-mask outline instead.
 
-## The pages (v2)
+## The pages
 
 | Page | Content |
 |---|---|
-| 1 | Summary tiles, and the score and class mix of your locations against all Canadian land |
-| 2 | Where the locations are: 40 km hexagon counts on a basemap, plus counts by province and city |
-| 3 | **Smoothed score**, the main measure: continuous raster, your locations coloured by score, histogram, key numbers, formula |
-| 4 | Times burned: raster, your burned locations on a basemap, bar chart, key numbers, formula |
-| 5 | Years since last burn: the same layout; the histogram covers only locations with fire in the record |
-| 6 | Fire-history class: the same layout |
-| 7 | The 25 locations with the highest smoothed score |
-| 8 | By province: mean and max score, score 10+, % fire in the cell, Moderate+, High+, watchlist (and value) |
-| 9 | Summary statistics for every measure |
-| 10 | Data, sampling and every formula |
-
-The burn-rate layers are left out of the pages, because they are times burned divided by the
-number of years. They still appear in the summary statistics and the spreadsheet.
+| 1 | Summary numbers, and the score and class mix of our sampled locations against all Canadian land |
+| 2 | Data, sampling, every variable and formula |
+| 3 | Where the locations are: 40 km hexagon counts on a basemap, plus counts by province and city |
+| 4 | Smoothed score: continuous raster, our locations coloured by score, histogram, key numbers, formula |
+| 5 | Times burned: raster, burned locations on a basemap, bar chart, key numbers, formula |
+| 6 | Years since last burn: same layout; the histogram covers only locations with fire in the record |
+| 7 | Fire-history class: same layout |
+| 8 | Watchlist: no fire in the location's own cell, smoothed score ≥ 10; map + table with km to nearest fire |
+| 9 | By province |
+| 10 | Summary statistics |
 
 ## Columns added to your rows
 
@@ -65,6 +62,6 @@ These pages were made from **synthetic** locations (jittered points around Canad
 Some fall in lakes or the sea, which is why they show as unmatched.
 
 ![summary](preview/page_01.png)
-![where](preview/page_02.png)
-![score](preview/page_03.png)
-![years since last burn](preview/page_05.png)
+![formulas](preview/page_02.png)
+![score](preview/page_04.png)
+![watchlist](preview/page_08.png)
